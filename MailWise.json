@@ -1,0 +1,1203 @@
+{
+  "name": "MailWise",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Edit Fields').item.json.id }}",
+        "labelIds": [
+          "Label_6839189320329432746"
+        ]
+      },
+      "id": "47ca7f33-a91d-42bb-aa8c-59a624eb1816",
+      "name": "Add label \"Urgent\" to email",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        224,
+        1472
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "641dec83-6109-46ba-a8fd-8abf031153e1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dkdWSQKdn7cETYiz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Edit Fields').item.json.id }}",
+        "labelIds": [
+          "Label_3321740543306708069"
+        ]
+      },
+      "id": "1f36d005-f5ad-46db-a4ac-801df1218b08",
+      "name": "Add label \"Opportunities\" to email",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        224,
+        1856
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "7e2885d6-bce0-44c1-9252-9b6bc36c79b7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dkdWSQKdn7cETYiz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Edit Fields').item.json.id }}",
+        "labelIds": [
+          "Label_1567599726229881589"
+        ]
+      },
+      "id": "345af22b-6a27-422d-b1a1-75f72962da30",
+      "name": "Add label \"Bills & Subscriptions\" to email",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        224,
+        2048
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "b2ac3b56-2a04-4e74-933c-63771dcf0d91",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dkdWSQKdn7cETYiz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "trash",
+        "threadId": "={{ $('Edit Fields').item.json.threadId }}"
+      },
+      "id": "85c7bd60-c71a-41cb-8624-7581bd22e9b5",
+      "name": "Move to Trash",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        240,
+        2496
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "c17acede-c453-4bd4-ac08-e51411133440",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dkdWSQKdn7cETYiz",
+          "name": "Gmail account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "99999999-dddd-4d4d-8d8d-000000000001",
+              "name": "digestEntry",
+              "type": "object",
+              "value": "={{ { subject: $('Edit Fields').item.json.subject, from: $('Edit Fields').item.json.from, summary: $('AI Agent').item.json.output.summary } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e629759b-b760-46cb-95fd-23161d51cad0",
+      "name": "Prepare Digest Entry",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        528,
+        2496
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "digestEntry",
+              "renameField": true,
+              "outputFieldName": "digestEntries"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1b567135-2256-4b46-b20e-cdd378817a04",
+      "name": "Aggregate Digest Entries",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        752,
+        2496
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sendTo": "pushkaragrawal1702@gmail.com",
+        "subject": "=🧹 Inbox Cleanup: {{ $json.digestEntries.length }} email(s) moved to Trash",
+        "message": "=<p>The following emails were classified as Spam and moved to Gmail Trash. They stay recoverable there for 30 days — check below and restore anything that looks important.</p><ul>{{ $json.digestEntries.map(e => `<li><b>${e.subject}</b> — from ${e.from}<br>${e.summary}</li>`).join('') }}</ul>",
+        "options": {}
+      },
+      "id": "51093054-c8eb-4833-9003-9713aaf38727",
+      "name": "Send Cleanup Digest",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        976,
+        2496
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "a695c150-856c-4dfe-82ff-d0d309d1cef3",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dkdWSQKdn7cETYiz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bbbbbbbb-ffff-4f4f-8f8f-000000000001",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              },
+              "leftValue": "={{ $json.output.hasEvent }}",
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "4290d7b6-d6c8-4738-bb59-29b056f19c7b",
+      "name": "Has Event?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -736,
+        1632
+      ],
+      "typeVersion": 2.2,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "content": "# 🗑️ Spam Handling\n\nSpam emails are:\n- Moved to Trash\n- Logged for reporting\n\nA digest is generated so nothing is deleted silently.",
+        "height": 384,
+        "width": 672,
+        "color": 3
+      },
+      "id": "d74bd46e-aefd-4b5d-af70-981bffdb603a",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        432,
+        2272
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "21e099df-36d3-48d0-a35d-d51db3eaa6cf",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -2144,
+        1856
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "simple": false,
+        "filters": {
+          "readStatus": "unread"
+        },
+        "options": {}
+      },
+      "id": "44c6826a-aa75-4500-8098-7380da3056c2",
+      "name": "Get All Unread Messages1",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        -1920,
+        1856
+      ],
+      "webhookId": "59626731-064c-469a-ab85-a95df2480031",
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dkdWSQKdn7cETYiz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "11111111-aaaa-4a4a-8a8a-111111111111",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.output.labels.includes('Urgent') }}",
+                    "rightValue": "=Urgent"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Urgent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "22222222-aaaa-4a4a-8a8a-222222222222",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.output.labels.includes('College/TnP') }}",
+                    "rightValue": "College/TnP"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "College/TnP"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "33333333-aaaa-4a4a-8a8a-333333333333",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.output.labels.includes('Opportunities') }}",
+                    "rightValue": "Opportunities"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Opportunities"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "44444444-aaaa-4a4a-8a8a-444444444444",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.output.labels.includes('Bills & Subscriptions') }}",
+                    "rightValue": "Bills & Subscriptions"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Bills & Subscriptions"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "55555555-aaaa-4a4a-8a8a-555555555555",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.output.labels.includes('Informational') }}",
+                    "rightValue": "Informational"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Informational"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "66666666-aaaa-4a4a-8a8a-666666666666",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.output.labels.includes('Spam') }}",
+                    "rightValue": "Spam"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Spam"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none",
+          "allMatchingOutputs": true
+        }
+      },
+      "id": "a07d3f00-317c-404e-802f-3ca61113ee48",
+      "name": "Switch1",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        -64,
+        1808
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Edit Fields').item.json.id }}",
+        "labelIds": [
+          "Label_3585767425021826432"
+        ]
+      },
+      "id": "5124d23c-cb44-426e-b2c4-ca5e8d8492e7",
+      "name": "Add label \"Informational\" to email1",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        224,
+        2240
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "a8493856-89a6-47a9-b3a2-63e83a47f7af",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dkdWSQKdn7cETYiz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $json.id }}"
+      },
+      "id": "343fbf6c-409d-485b-8fe6-cba81717befe",
+      "name": "Mark email as read1",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        512,
+        1856
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "967d14e9-35a0-4f74-b958-b22390c9aeef",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dkdWSQKdn7cETYiz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# 📥 Email Intake\n- Trigger runs on schedule\n- Fetch unread Gmail messages\n- Extract sender, subject, body and metadata\n- Process one email at a time",
+        "height": 464,
+        "width": 464,
+        "color": 5
+      },
+      "id": "a5098114-f2f2-4dbf-8335-febc584ae690",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2224,
+        1632
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# ⚠️ Setup Required (Complete Before Running)\n\n* Connect your **Gmail OAuth2** credential.\n* Connect your **Google Calendar OAuth2** credential.\n* Add your **Groq API** credential to **both AI nodes**:\n\n  * Email Analysis\n  * Reply Draft Generator\n* In Gmail, create the following labels:\n\n  * Urgent\n  * College/TnP\n  * Opportunities\n  * Bills & Subscriptions\n  * Informational\n* Open each **Add Label** node and select the corresponding Gmail label (label IDs are unique to each Gmail account and cannot be exported).\n* In **Create Calendar Event**, choose the Google Calendar where events should be created.\n* In **Create Gmail Draft**, verify the sender account is your Gmail account.\n* In **Send Cleanup Digest**, replace `YOUR_EMAIL@gmail.com` with your own email address.\n* Review the **Schedule Trigger** and adjust how frequently you want the workflow to check for new emails.\n",
+        "height": 560,
+        "width": 672
+      },
+      "id": "d5d08422-6500-4bb0-a0a7-94fda0353c11",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2240,
+        2112
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# 🧠 AI Email Analysis\n\nThe AI analyzes each email and returns:\n- Labels\n- Summary\n- Event detection\n- Reply requirement\n\nEverything downstream uses this structured output.",
+        "height": 928,
+        "width": 688,
+        "color": 5
+      },
+      "id": "6e427912-5cad-4c7b-bdc5-f6988017fd4f",
+      "name": "Sticky Note7",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1536,
+        1584
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# 📅 Calendar Automation\n\nIf an email contains a meeting, deadline or scheduled event:\n• Extract title\n• Extract date & time\n• Create a Google Calendar event",
+        "height": 368,
+        "width": 448,
+        "color": 4
+      },
+      "id": "75d4cad2-270e-43f6-9493-86a23c33cc7a",
+      "name": "Sticky Note8",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -768,
+        1408
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Edit Fields').item.json.id }}",
+        "labelIds": [
+          "Label_3926769789657363974"
+        ]
+      },
+      "id": "8eada407-0822-4c93-bd48-6e6997cabe8e",
+      "name": "Add label \"College\" to email",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        224,
+        1664
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "8919ae23-cfd7-4a1e-9bab-86dd672cb59b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dkdWSQKdn7cETYiz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1472,
+        1856
+      ],
+      "id": "8849e46b-6586-4615-8880-53f697f35447",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1024,
+        2272
+      ],
+      "id": "928efc2e-390f-46af-98f4-3d1a8dd9083f",
+      "name": "Wait",
+      "webhookId": "5e3be053-dea0-4e8f-83ff-390f46a9fe76"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"labels\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\",\n        \"enum\": [\"Urgent\", \"College/TnP\", \"Opportunities\", \"Bills & Subscriptions\", \"Informational\", \"Spam\"]\n      }\n    },\n    \"summary\": { \"type\": \"string\" },\n    \"hasEvent\": { \"type\": \"boolean\" },\n    \"replyNeeded\": { \"type\": \"boolean\" },\n    \"eventTitle\": { \"type\": \"string\" },\n    \"eventDateTime\": { \"type\": \"string\" }\n  },\n  \"required\": [\"labels\", \"summary\", \"hasEvent\",  \"replyNeeded\"]\n}\n",
+        "autoFix": true
+      },
+      "id": "74c729e2-a338-4903-81d2-32f09601e195",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        -1168,
+        2064
+      ],
+      "typeVersion": 1.3,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -1248,
+        2224
+      ],
+      "id": "d191f3d3-44d0-49a9-8c2c-c00fe33524f8",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "m6O9xXDGFQXmTeaZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "pushkaragrawal1702@gmail.com",
+          "mode": "list",
+          "cachedResultName": "pushkaragrawal1702@gmail.com"
+        },
+        "start": "={{ DateTime.fromISO($json.output.eventDateTime).setZone('Asia/Kolkata').toISO() }}",
+        "end": "={{ $json.output.eventDateTime ? DateTime.fromISO($json.output.eventDateTime).plus({ hours: 1 }).toISO() : null }}",
+        "additionalFields": {
+          "description": "={{ $json.output.summary }}",
+          "summary": "={{ $json.output.eventTitle }}"
+        }
+      },
+      "id": "1236d02b-d9a0-48b2-9226-57700f86e8a9",
+      "name": "Create Calendar Event1",
+      "type": "n8n-nodes-base.googleCalendar",
+      "position": [
+        -448,
+        1616
+      ],
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "waitBetweenTries": 3000,
+      "maxTries": 2,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "FkfN3uaumynU9D9Z",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a strict JSON generator.\n\nCurrent date and time (use this to resolve relative dates): {{ $now.toISO() }}\n\nAnalyze the following email and assign one or more labels from this list. An email CAN have multiple labels, EXCEPT \"Spam\" which is always exclusive — if Spam applies, return ONLY [\"Spam\"] and nothing else.\n\n- \"Urgent\" → needs my attention or a reply soon: overdue bills, security alerts, anything someone is actively waiting on me for.\n- \"College/TnP\" → emails from college groups, the Training & Placement cell, or teachers.\n- \"Opportunities\" → anything tied to a job, internship, hackathon, or competition I am already engaged with: application/registration confirmations, status updates (profile viewed, shortlisted, interview scheduled, accepted, rejected), or logistics (schedule changes, results, prize announcements).\n- \"Bills & Subscriptions\" → bills, receipts, payment confirmations, subscription renewals.\n- \"Informational\" → general updates, shipping/delivery alerts, social notifications, and job/hackathon RECOMMENDATION digests for things I have NOT applied to.\n- \"Spam\" → promotional or marketing junk with no real value.\n\nAlso detect whether the email references a specific date, deadline, or event (an interview, a meeting, a due date, a hackathon date, a deadline to respond). If so, set hasEvent to true and extract eventTitle (a short label) and eventDateTime (full ISO 8601 with timezone offset, e.g. 2026-06-29T18:00:00+05:30 — resolve relative phrases like \"tomorrow\" or \"in 3 days\" using the current date/time given above). If there is no specific date, set hasEvent to false and omit eventTitle/eventDateTime.\n\nDetermine whether this email requires a reply from me.\nSet replyNeeded to true if:\n- The sender is asking a question.\n- A confirmation is requested.\n- A response is expected.\n- Someone is waiting for my action.\nOtherwise return false.\n\nSummary: extract the most important information into 1 sentence, not more than 4000 characters.\n\nReturn your response as a JSON object, **only using** this exact format:\n{ \"labels\": [\"<one or more of the categories above>\"], \"summary\": \"<Summary>\", \"hasEvent\": <true or false>, \"eventTitle\": \"<title, omit if hasEvent is false>\", \"eventDateTime\": \"<ISO datetime, omit if hasEvent is false>\" }\n\nExample (multi-label, with event):\n{ \"labels\": [\"Urgent\", \"Opportunities\"], \"summary\": \"Tech Corp has shortlisted you for a technical interview and asks you to confirm a slot by Friday.\", \"hasEvent\": true, \"replyNeeded\":true, \"eventTitle\": \"Tech Corp interview slot confirmation deadline\", \"eventDateTime\": \"2026-06-26T23:59:00\" }\n\nRules:\n- Do NOT return markdown (no triple backticks, no ```json)\n- Use double quotes for keys and string values\n- Do NOT include explanations, extra text, or formatting\n- Return ONLY the one JSON object described above, replacing values as needed\n\nReview your response to ensure you meet the rules before you generate the output.\n\nEmail content:\nSubject: {{ $json.subject }}\nFrom: {{ $json.from }}\n\nBody:\n{{ $json.text.substring(0, 1500) }}\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "id": "4365075a-bba7-415b-8c64-9f211379955d",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        -1264,
+        1872
+      ],
+      "retryOnFail": true,
+      "typeVersion": 2,
+      "alwaysOutputData": true,
+      "waitBetweenTries": 3000,
+      "maxTries": 2
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        2464
+      ],
+      "id": "e8e25eea-e891-408e-96ad-71a2ef61687d",
+      "name": "Groq Chat Model2",
+      "credentials": {
+        "groqApi": {
+          "id": "m6O9xXDGFQXmTeaZ",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ \"Re: \" + $(\"Edit Fields\").item.json.subject }}",
+        "message": "={{ $json.text }}",
+        "options": {
+          "replyTo": "={{ $('Edit Fields').item.json.fromEmail }}"
+        }
+      },
+      "id": "e007ebed-88d2-4f79-bddb-9a932816ce1d",
+      "name": "Create Draft",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        -144,
+        2320
+      ],
+      "typeVersion": 2.1,
+      "webhookId": "a8493856-89a6-47a9-b3a2-63e83a47f7af",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dkdWSQKdn7cETYiz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bbbbbbbb-ffff-4f4f-8f8f-000000000001",
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              },
+              "leftValue": "=={{ $json.output.replyNeeded }}",
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "id": "0ad958c2-963a-4edf-a440-01011548ac35",
+      "name": "Reply Needed?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        -704,
+        2336
+      ],
+      "typeVersion": 2.2,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an email assistant.\n\nRead the email below and draft a professional reply.\n\nThe draft should:\n\ndirectly answer the sender\nbe polite\nbe concise\nnot invent facts\nleave placeholders if information is missing\n\nReturn only the email body.\n\nEmail:\n{{ $('Edit Fields').item.json.text }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -480,
+        2320
+      ],
+      "id": "31b96a79-c7cf-48dd-a2ef-85ff086c0670",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e8fecc44-bfcf-42cd-a82d-b2963d8f4c94",
+              "name": "id",
+              "type": "string",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "id": "4967158d-b4ee-41b4-a945-d19462d08886",
+              "name": "text",
+              "type": "string",
+              "value": "={{ $json.text ? $json.text : $json.html}}"
+            },
+            {
+              "id": "48cf009c-69ea-48aa-9de8-d53039aca4a5",
+              "name": "from",
+              "type": "string",
+              "value": "={{ $json.from.value[0].name }}"
+            },
+            {
+              "id": "b55ee48b-0050-48ba-8012-4e9c7f308d49",
+              "name": "fromEmail",
+              "value": "={{ $json.from.value[0].address}}",
+              "type": "string"
+            },
+            {
+              "id": "cfd63044-5e92-44c3-ad28-16118c1b83cb",
+              "name": "threadId",
+              "type": "string",
+              "value": "={{ $json.threadId }}"
+            },
+            {
+              "id": "a1b2c3d4-e5f6-4789-a1b2-c3d4e5f6a7b8",
+              "name": "subject",
+              "type": "string",
+              "value": "={{ $json.subject }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d4202b25-27f2-44dc-90d1-b4691232ed42",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1696,
+        1856
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "content": "# 📧 MailWise\n## AI-Powered Gmail Assistant\n\n✔ Smart Classification\n✔ Auto Labeling\n✔ Calendar Integration\n✔ AI Reply Drafts\n✔ Spam Management",
+        "height": 336,
+        "width": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2224,
+        1264
+      ],
+      "typeVersion": 1,
+      "id": "07361564-0ca9-4c66-8443-4ea2ef3d2deb",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# 🏷️ Automatic Gmail Labels\n\nAssign one or more labels:\n- Urgent\n- College/TnP\n- Opportunities\n- Bills & Subscriptions\n- Informational\n- Spam\n\nOne email may receive multiple labels.",
+        "height": 1280,
+        "width": 288,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        128,
+        1136
+      ],
+      "typeVersion": 1,
+      "id": "5c9a0a6c-d536-4c5a-856f-e0f07486792a",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# ✍️ Reply Draft Generator\n\nIf the AI determines that a response is expected:\n- Generate a professional draft\n- Save it as a Gmail Draft\n\nNo emails are sent automatically.",
+        "height": 528,
+        "width": 768,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -784,
+        2096
+      ],
+      "typeVersion": 1,
+      "id": "4a5ea66d-0db6-43e8-b5cf-45263bcee911",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 208,
+        "width": 304,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        128,
+        2448
+      ],
+      "typeVersion": 1,
+      "id": "45382164-f35d-4637-b1c5-5271fcdd271d",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Add label \"Urgent\" to email": {
+      "main": [
+        [
+          {
+            "node": "Mark email as read1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label \"Opportunities\" to email": {
+      "main": [
+        [
+          {
+            "node": "Mark email as read1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label \"Bills & Subscriptions\" to email": {
+      "main": [
+        [
+          {
+            "node": "Mark email as read1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move to Trash": {
+      "main": [
+        [
+          {
+            "node": "Prepare Digest Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Digest Entry": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Digest Entries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Digest Entries": {
+      "main": [
+        [
+          {
+            "node": "Send Cleanup Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Event?": {
+      "main": [
+        [
+          {
+            "node": "Create Calendar Event1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get All Unread Messages1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Unread Messages1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Add label \"Urgent\" to email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label \"College\" to email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label \"Opportunities\" to email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label \"Bills & Subscriptions\" to email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label \"Informational\" to email1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Move to Trash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label \"Informational\" to email1": {
+      "main": [
+        [
+          {
+            "node": "Mark email as read1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add label \"College\" to email": {
+      "main": [
+        [
+          {
+            "node": "Mark email as read1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Has Event?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Reply Needed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply Needed?": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Create Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0a5a1b8d-701e-47d9-8c56-d12eda34c1b9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "82c4f43aa132c41a69c69d19f37cefc81bb9ab26451184e21844dc3d65af260d"
+  },
+  "nodeGroups": [],
+  "id": "DRex7MEERSlYnOcF",
+  "tags": []
+}
