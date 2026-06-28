@@ -1,88 +1,247 @@
-# MailWise
+# 📬 MailWise
 
-**MailWise** is an AI-powered email assistant built with **n8n**, **Groq**, **Gmail API**, and **Google Calendar API**. It automatically organizes your inbox, labels emails, detects important events, creates calendar entries, generates reply drafts, and cleans up spam—reducing manual email management.
+<p align="center">
 
----
+![n8n](https://img.shields.io/badge/n8n-FF6D5A?style=for-the-badge\&logo=n8n\&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-000000?style=for-the-badge)
+![Gmail API](https://img.shields.io/badge/Gmail_API-EA4335?style=for-the-badge\&logo=gmail\&logoColor=white)
+![Google Calendar](https://img.shields.io/badge/Google_Calendar-4285F4?style=for-the-badge\&logo=googlecalendar\&logoColor=white)
+![Google Sheets](https://img.shields.io/badge/Google_Sheets-34A853?style=for-the-badge\&logo=googlesheets\&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge\&logo=docker\&logoColor=white)
 
-## Features
+</p>
 
-* AI-powered email classification
-* Automatic Gmail labeling
-* Calendar event extraction and creation
-* AI-generated reply drafts (saved as Gmail drafts)
-* Spam cleanup with digest notification
-* Multi-label support for emails
-* Scheduled inbox monitoring
+MailWise is an AI-powered email management workflow built with **n8n** that helps you keep your inbox organized without manual effort.
 
----
-
-## Workflow Overview
-
-When a new unread email is detected, MailWise:
-
-1. Retrieves unread emails from Gmail.
-2. Uses an LLM to analyze the email.
-3. Generates:
-
-   * Labels
-   * Summary
-   * Event information
-   * Reply requirement
-4. Applies Gmail labels automatically.
-5. Creates a Google Calendar event if an event is detected.
-6. Generates a reply draft if a response is required.
-7. Moves spam emails to Trash.
-8. Sends a cleanup digest after spam removal.
+It automatically categorizes emails, creates calendar events from important dates, generates AI-powered reply drafts, logs processed emails to Google Sheets, and delivers a daily inbox summary so you never miss what matters.
 
 ---
 
-## Tech Stack
+# ✨ Features
 
-- **Automation:** n8n
-- **LLM:** Groq
-- **Email Integration:** Gmail API
-- **Calendar Integration:** Google Calendar API
-- **Deployment:** Docker
+### 📩 Smart Email Classification
+
+Automatically categorizes incoming emails into:
+
+* Urgent
+* College/TnP
+* Opportunities
+* Bills & Subscriptions
+* Informational
+* Spam
 
 ---
 
-## Project Structure
+### 📅 Automatic Calendar Events
 
+Detects:
+
+* Interviews
+* Meetings
+* Deadlines
+* Contests
+* Other scheduled events
+
+and automatically creates Google Calendar events.
+
+<p align="center">
+<img src="screenshots/calender-event.png" width="850">
+</p>
+
+---
+
+### ✍ AI Reply Drafts
+
+When an email requires your response, MailWise generates a professional draft and saves it directly to Gmail Drafts.
+
+<p align="center">
+<img src="screenshots/reply-draft.png" width="850">
+</p>
+
+---
+
+### 📊 Email Logging
+
+Every processed email is logged into Google Sheets for tracking and reporting.
+
+Logged information includes:
+
+* Sender
+* Subject
+* Labels
+* Summary
+* Reply Needed
+* Event Information
+* Timestamp
+
+<p align="center">
+<img src="screenshots/google-sheet.png" width="850">
+</p>
+
+---
+
+### 🌙 Daily Inbox Summary
+
+Every night, MailWise generates an AI-powered digest containing:
+
+* Inbox statistics
+* Upcoming events
+* Priority emails
+* Pending replies
+* Spam cleaned
+* Suggested action items
+
+<p align="center">
+<img src="screenshots/daily-digest.png" width="850">
+</p>
+
+---
+
+# ⚙ Workflow
+
+The entire automation runs as a **single n8n workflow**.
+
+<p align="center">
+  <img src="screenshots/workflow.png" alt="MailWise Workflow">
+</p>
+
+```text
+                            Every Hour
+                                │
+                                ▼
+                        Fetch Unread Emails
+                                │
+                                ▼
+                        AI Email Analysis
+                                │
+                ┌───────────────┼──────────────────────┐
+                │               │                      │
+                ▼               ▼                      ▼
+          Google Sheets    Calendar Event         Reply Draft
+             Logging         Detection             Detection
+                │               │                      │
+                │         Create Calendar        Create Gmail
+                │             Event                 Draft
+                │
+                ▼
+       Label Routing (Switch)
+                │
+     ┌──────────┼────────────┬───────────┬──────────┐
+     ▼          ▼            ▼           ▼          ▼
+  Urgent    College    Opportunities   Bills  Informational
+     │          │            │           │          │
+     └──────────┴────────────┼───────────┴──────────┘
+                             │
+                             ▼
+                       Spam Cleanup
+                             │
+                             ▼
+                    Mark Email as Read
+
+
+
+                     Every Day (12:05 AM)
+                              │
+                              ▼
+                   Read Google Sheets Logs
+                              │
+                              ▼
+                     Generate Statistics
+                              │
+                              ▼
+                      AI Daily Summary
+                              │
+                              ▼
+                      Email Daily Digest
 ```
-MailWise/
+
+
+---
+
+# 🛠 Tech Stack
+
+| Category   | Technology                                |
+| ---------- | ----------------------------------------- |
+| Automation | n8n                                       |
+| LLM        | Groq (GPT-OSS 20B & Llama 3.1 8B Instant) |
+| Email      | Gmail API                                 |
+| Calendar   | Google Calendar API                       |
+| Database   | Google Sheets                             |
+| Deployment | Docker                                    |
+
+---
+
+# 📁 Repository Structure
+
+```text
+MailWise
 │
-├── workflow.json
-├── README.md
-└── .env.example
+├── MailWise.json
+├── screenshots
+│   ├── workflow.png
+│   ├── calender-event.png
+│   ├── reply-draft.png
+│   ├── google-sheet.png
+│   └── daily-digest.png
+│
+├── .env.example
+└── README.md
 ```
-> Note: MailWise stores credentials securely using n8n's built-in credential manager. The .env.example file is provided only to document the required configuration and is not consumed directly by the workflow.
 
 ---
 
-## Setup
+# 🚀 Getting Started
 
-### 1. Clone the repository
+## 1. Clone the repository
 
 ```bash
 git clone https://github.com/<your-username>/MailWise.git
+
 cd MailWise
 ```
 
-### 2. Import the workflow
+---
 
-Import `workflow.json` into your n8n instance.
+## 2. Start n8n
 
-### 3. Configure credentials
+```bash
+docker run -d \
+  --name n8n \
+  -p 5678:5678 \
+  -e GENERIC_TIMEZONE="Asia/Kolkata" \
+  -e TZ="Asia/Kolkata" \
+  -v n8n_data:/home/node/.n8n \
+  docker.n8n.io/n8nio/n8n
+```
+
+Open:
+
+```text
+http://localhost:5678
+```
+
+---
+
+## 3. Import the workflow
+
+Import **MailWise.json** into n8n.
+
+---
+
+## 4. Configure Credentials
 
 Create the following credentials inside n8n:
 
 * Gmail OAuth2
 * Google Calendar OAuth2
+* Google Sheets OAuth2
 * Groq API
 
-### 4. Create Gmail labels
+---
 
-Create these labels in Gmail:
+## 5. Gmail Labels
+
+Create these labels:
 
 * Urgent
 * College/TnP
@@ -90,44 +249,40 @@ Create these labels in Gmail:
 * Bills & Subscriptions
 * Informational
 
-Then open each **Add Label** node in n8n and select the corresponding Gmail label.
-
-### 5. Configure the workflow
-
-* Select your Google Calendar in the Calendar node.
-* Replace `YOUR_EMAIL@gmail.com` inside the Cleanup Digest node.
-* Add your Groq credentials to both AI nodes.
-* Enable the workflow.
+Spam emails are automatically moved to Trash.
 
 ---
 
-## Example AI Output
+## 6. Final Configuration
 
-```json
-{
-  "labels": [
-    "Urgent",
-    "Opportunities"
-  ],
-  "summary": "TechCorp has scheduled your interview for Monday at 2 PM.",
-  "hasEvent": true,
-  "replyNeeded": true,
-  "eventTitle": "TechCorp Interview",
-  "eventDateTime": "2026-06-30T14:00:00"
-}
-```
+* Connect your Google Sheet.
+* Configure the recipient email for the daily summary.
+* Select the Gmail labels in each **Add Label** node.
 
 ---
 
-## Future Improvements
+# 📂 Environment Variables
 
-* Daily inbox summary
-* Task extraction
+See **.env.example**.
+
+---
+
+# 💡 Future Improvements
+
+* Weekly & Monthly inbox reports
+* Priority score for emails
 * Follow-up reminders
-* Job application tracker
-* Attachment summarization
-* Sender reputation scoring
-* AI-powered search
+* Duplicate calendar event detection
+* Analytics dashboard
+* Slack / Discord notifications
+
+---
+
+# 🤝 Contributing
+
+Contributions, suggestions and feature requests are always welcome.
+
+If you'd like to improve MailWise, feel free to fork the repository and open a pull request.
 
 ---
 
